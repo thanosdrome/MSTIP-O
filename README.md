@@ -8,6 +8,7 @@ Resilience: Deployed resources across multiple availability zones for high avail
 
 
 # Architecture
+![Screenshot 2024-12-10 125011](https://github.com/user-attachments/assets/41bc5d4b-582d-4859-9ce3-4920a3f33137)
 
 
 ## Author
