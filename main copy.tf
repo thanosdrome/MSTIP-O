@@ -151,6 +151,47 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
+#Launch Template
+
+resource "aws_launch_template" "ec2_launch_template" {
+  name = "web-server"
+
+  image_id      = "ami-053b12d3152c0cc71" //Copy the ami id from aws console
+  instance_type = "t2.micro"
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups             = [aws_security_group.webSg.id]
+  }
+
+  user_data = filebase64("userdata.sh")
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "ec2-web-server"
+    }
+  }
+}
+
+# Auto Scaling Group
+
+resource "aws_autoscaling_group" "ec2_asg" {
+  name                = "web-asg"
+  desired_capacity    = 2
+  min_size            = 2
+  max_size            = 4
+  target_group_arns   = [aws_lb_target_group.tg.arn]
+  vpc_zone_identifier = aws_subnet.sub1[*].id
+
+  launch_template {
+    id      = aws_launch_template.ec2_launch_template.id
+    version = "$Latest"
+  }
+
+  health_check_type = "EC2"
+}
+
 output "loadbalancerdns" {
   value = aws_lb.myalb.dns_name
 }
